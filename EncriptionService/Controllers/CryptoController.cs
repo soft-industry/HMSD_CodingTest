@@ -3,8 +3,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace EncriptionService.Controllers
+namespace WebApps.EncriptionService.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -18,22 +19,22 @@ namespace EncriptionService.Controllers
         }
 
         [HttpGet]
-        [Route("encrypt")]
-        public string Encrypt(string secret)
+        [Route("encrypt/{secret}")]
+        public async Task<IActionResult> Encrypt(string secret)
         {
             throw new NotImplementedException();
         }
 
         [HttpGet]
-        [Route("decrypt")]
-        public string Decrypt(string data)
+        [Route("decrypt/{data}")]
+        public async Task<IActionResult> Decrypt(string data)
         {
             throw new NotImplementedException();
         }
 
         [HttpGet]
         [Route("rotate")]
-        public void RotateEncryptionKey(string data)
+        public void RotateEncryptionKey()
         {
             throw new NotImplementedException();
         }

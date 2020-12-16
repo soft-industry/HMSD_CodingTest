@@ -1,34 +1,57 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using WebApps.ApiGateway.Extensions;
 
-namespace ApiGateway.Controllers
+namespace WebApps.ApiGateway.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class CryptoController : ControllerBase
     {
         private readonly ILogger<CryptoController> _logger;
+        private readonly string _baseUrl;
 
-        public CryptoController(ILogger<CryptoController> logger)
+        public CryptoController(IConfiguration configuration, ILogger<CryptoController> logger)
         {
             _logger = logger;
+            _baseUrl = configuration.GetValue<string>("InternalApiBaseUrl");
         }
 
         [HttpGet]
-        [Route("encrypt")]
-        public string Encrypt(string secret)
+        [Route("encrypt/{secret}")]
+        public async Task<IActionResult> Encrypt(string secret)
         {
-            throw new NotImplementedException();
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(CreateInternalUri("crypto/encrypt/", secret)))
+                {
+                    return await response.GetActionResult();
+                }
+            }
         }
 
         [HttpGet]
-        [Route("decrypt")]
-        public string Decrypt(string data)
+        [Route("decrypt/{data}")]
+        public async Task<IActionResult> Decrypt(string data)
         {
-            throw new NotImplementedException();
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(CreateInternalUri("crypto/decrypt/", data)))
+                {
+                    return await response.GetActionResult();
+                }
+            }
+        }
+
+        private Uri CreateInternalUri(string relativePath, string parameter = "")
+        {
+            var uriString = $"{_baseUrl}{relativePath}{parameter}";
+
+            return new Uri(uriString);
         }
     }
 }
