@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using WebApps.ApiGateway.Extensions;
+using WebApps.ApiGateway.Models;
 
 namespace WebApps.ApiGateway.Controllers
 {
@@ -21,26 +24,30 @@ namespace WebApps.ApiGateway.Controllers
             _baseUrl = configuration.GetValue<string>("InternalApiBaseUrl");
         }
 
-        [HttpGet]
-        [Route("encrypt/{secret}")]
-        public async Task<IActionResult> Encrypt(string secret)
+        [HttpPost]
+        [Route("encrypt")]
+        public async Task<IActionResult> Encrypt([FromBody] EncryptParameters encryptParameters)
         {
             using (var client = new HttpClient())
             {
-                using (var response = await client.GetAsync(CreateInternalUri("crypto/encrypt/", secret)))
+                var content = new StringContent(JsonConvert.SerializeObject(encryptParameters), Encoding.UTF8, "application/json");
+
+                using (var response = await client.PostAsync(CreateInternalUri("crypto/encrypt"), content))
                 {
                     return await response.GetActionResult();
                 }
             }
         }
 
-        [HttpGet]
-        [Route("decrypt/{data}")]
-        public async Task<IActionResult> Decrypt(string data)
+        [HttpPost]
+        [Route("decrypt")]
+        public async Task<IActionResult> Decrypt([FromBody] DecryptParameters decryptParameters)
         {
             using (var client = new HttpClient())
             {
-                using (var response = await client.GetAsync(CreateInternalUri("crypto/decrypt/", data)))
+                var content = new StringContent(JsonConvert.SerializeObject(decryptParameters), Encoding.UTF8, "application/json");
+
+                using (var response = await client.PostAsync(CreateInternalUri("crypto/decrypt"), content))
                 {
                     return await response.GetActionResult();
                 }

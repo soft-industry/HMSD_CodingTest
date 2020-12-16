@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using WebApps.EncriptionService.Helpers;
+using WebApps.EncriptionService.Models;
 
 namespace WebApps.EncriptionService.Controllers
 {
@@ -12,31 +11,44 @@ namespace WebApps.EncriptionService.Controllers
     public class CryptoController : ControllerBase
     {
         private readonly ILogger<CryptoController> _logger;
+        private readonly string _dirName;
 
-        public CryptoController(ILogger<CryptoController> logger)
+        public CryptoController(IConfiguration configuration, ILogger<CryptoController> logger)
         {
             _logger = logger;
+            _dirName = configuration.GetValue<string>("KeyStorageFolder");
         }
 
-        [HttpGet]
-        [Route("encrypt/{secret}")]
-        public async Task<IActionResult> Encrypt(string secret)
+        [HttpPost]
+        [Route("encrypt")]
+        public IActionResult Encrypt([FromBody] EncryptParameters encryptParameters)
         {
-            throw new NotImplementedException();
+            if (encryptParameters == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(Cryptography.Encrypt(_dirName, encryptParameters.Secret));
         }
 
-        [HttpGet]
-        [Route("decrypt/{data}")]
-        public async Task<IActionResult> Decrypt(string data)
+        [HttpPost]
+        [Route("decrypt")]
+        public IActionResult Decrypt([FromBody] DecryptParameters decryptParameters)
         {
-            throw new NotImplementedException();
+            if (decryptParameters == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(Cryptography.Decrypt(_dirName, decryptParameters.Data));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("rotate")]
         public void RotateEncryptionKey()
         {
-            throw new NotImplementedException();
+            Cryptography.DeleteKey(_dirName);
+            Cryptography.CreateKey(_dirName);
         }
     }
 }

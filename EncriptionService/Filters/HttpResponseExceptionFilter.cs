@@ -18,7 +18,6 @@ namespace WebApps.EncriptionService.Filters
                 });
 
                 jsonRes.StatusCode = 500;
-
                 context.Result = jsonRes;
                 context.ExceptionHandled = true;
             }
