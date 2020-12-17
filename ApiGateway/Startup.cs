@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebApps.ApiGateway.ServicesConfigurations;
 
 namespace WebApps.ApiGateway
 {
@@ -18,6 +19,9 @@ namespace WebApps.ApiGateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks()
+                .AddCheck<ApiGatewayHealthCheck>("SimpleHealthCheck");
+
             services.AddControllers(options => options.Filters.Add(new Filters.HttpResponseExceptionFilter()));
         }
 
@@ -38,6 +42,7 @@ namespace WebApps.ApiGateway
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
