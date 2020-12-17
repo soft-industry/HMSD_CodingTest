@@ -30,6 +30,8 @@ namespace WebApps.ApiGateway.Controllers
         {
             using (var client = new HttpClient())
             {
+                client.SetAcceptEncodingHeader(this.HttpContext.Request.Headers);
+
                 var content = new StringContent(JsonConvert.SerializeObject(encryptParameters), Encoding.UTF8, "application/json");
 
                 using (var response = await client.PostAsync(CreateInternalUri("crypto/encrypt"), content))
@@ -45,6 +47,8 @@ namespace WebApps.ApiGateway.Controllers
         {
             using (var client = new HttpClient())
             {
+                client.SetAcceptEncodingHeader(this.HttpContext.Request.Headers);
+
                 var content = new StringContent(JsonConvert.SerializeObject(decryptParameters), Encoding.UTF8, "application/json");
 
                 using (var response = await client.PostAsync(CreateInternalUri("crypto/decrypt"), content))
